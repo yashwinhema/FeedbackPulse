@@ -1,679 +1,684 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2685.3">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px '.AppleSystemUIFontMonospaced'; color: #101010; -webkit-text-stroke: #101010; background-color: #ffffff}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px '.AppleSystemUIFontMonospaced'; color: #101010; -webkit-text-stroke: #101010; background-color: #ffffff; min-height: 15.0px}
-    span.s1 {font-kerning: none}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FeedbackPulse</title>
+<script src="https://cdn.jsdelivr.net/npm/mixpanel-browser@2.47.0/dist/mixpanel.umd.js"></script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+  --bg:#0f1117;--bg2:#1a1d27;--bg3:#22263a;
+  --border:#2e3350;--text:#e8eaf0;--muted:#7a7f99;
+  --purple:#7c6ff7;--purple2:#5c56d4;--green:#22c97a;
+  --red:#f25f5c;--amber:#f5a623;--blue:#4a9eff;
+  }
+  body{font-family:system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+  /* NAV */
+  nav{display:flex;align-items:center;justify-content:space-between;padding:14px 32px;border-bottom:1px solid var(--border);background:var(--bg2)}
+  .logo{font-size:18px;font-weight:700;color:var(--purple)}
+  .nav-links{display:flex;gap:8px}
+  .nav-btn{padding:7px 16px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:600;transition:all .2s}
+  .nav-btn.outline{background:transparent;border:1px solid var(--border);color:var(--text)}
+  .nav-btn.outline:hover{border-color:var(--purple);color:var(--purple)}
+  .nav-btn.primary{background:var(--purple);color:#fff}
+  .nav-btn.primary:hover{background:var(--purple2)}
+  /* PAGES */
+  .page{display:none;animation:fadeIn .25s ease}
+  .page.active{display:block}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  /* HERO */
+  .hero{max-width:760px;margin:80px auto;text-align:center;padding:0 24px}
+  .hero h1{font-size:48px;font-weight:800;line-height:1.15;margin-bottom:16px}
+  .hero h1 span{color:var(--purple)}
+  .hero p{font-size:18px;color:var(--muted);margin-bottom:40px;line-height:1.6}
+  .hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .btn-lg{padding:14px 32px;border-radius:10px;border:none;cursor:pointer;font-size:15px;font-weight:700;transition:all .2s}
+  .btn-lg.primary{background:var(--purple);color:#fff}
+  .btn-lg.primary:hover{background:var(--purple2);transform:translateY(-1px)}
+  .btn-lg.ghost{background:transparent;border:1px solid var(--border);color:var(--text)}
+  .btn-lg.ghost:hover{border-color:var(--purple);color:var(--purple)}
+  .features{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:900px;margin:60px auto 0;padding:0 24px}
+  .feature-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:24px}
+  .feature-card .icon{font-size:24px;margin-bottom:12px}
+  .feature-card h3{font-size:15px;font-weight:700;margin-bottom:8px}
+  .feature-card p{font-size:13px;color:var(--muted);line-height:1.5}
+  /* PRICING */
+  .pricing{max-width:860px;margin:60px auto;padding:0 24px}
+  .pricing h2{text-align:center;font-size:32px;font-weight:800;margin-bottom:40px}
+  .plans{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  .plan{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:28px;position:relative}
+  .plan.popular{border-color:var(--purple)}
+  .badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--purple);color:#fff;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px}
+  .plan-name{font-size:14px;color:var(--muted);font-weight:600;margin-bottom:8px}
+  .plan-price{font-size:36px;font-weight:800;margin-bottom:4px}
+  .plan-price span{font-size:14px;color:var(--muted);font-weight:400}
+  .plan-desc{font-size:13px;color:var(--muted);margin-bottom:24px}
+  .plan-features{list-style:none;margin-bottom:28px}
+  .plan-features li{font-size:13px;padding:6px 0;color:var(--muted);border-bottom:1px solid var(--border)}
+  .plan-features li::before{content:"✓ ";color:var(--green)}
+  .plan-btn{width:100%;padding:11px;border-radius:8px;border:none;cursor:pointer;font-size:14px;font-weight:700;transition:all .2s}
+  .plan-btn.primary{background:var(--purple);color:#fff}
+  .plan-btn.primary:hover{background:var(--purple2)}
+  .plan-btn.outline{background:transparent;border:1px solid var(--border);color:var(--text)}
+  .plan-btn.outline:hover{border-color:var(--purple);color:var(--purple)}
+  /* AUTH */
+  .auth-wrap{max-width:420px;margin:80px auto;padding:0 24px}
+  .auth-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:36px}
+  .auth-card h2{font-size:24px;font-weight:800;margin-bottom:6px}
+  .auth-card .sub{font-size:14px;color:var(--muted);margin-bottom:28px}
+  .field{margin-bottom:16px}
+  .field label{display:block;font-size:13px;font-weight:600;margin-bottom:6px;color:var(--muted)}
+  .field input,.field select{width:100%;padding:11px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;outline:none;transition:border .2s}
+  .field input:focus,.field select:focus{border-color:var(--purple)}
+  .submit-btn{width:100%;padding:13px;border-radius:10px;border:none;background:var(--purple);color:#fff;font-size:15px;font-weight:700;cursor:pointer;margin-top:8px;transition:all .2s}
+  .submit-btn:hover{background:var(--purple2)}
+  .auth-switch{text-align:center;margin-top:20px;font-size:13px;color:var(--muted)}
+  .auth-switch a{color:var(--purple);cursor:pointer;text-decoration:none}
+  /* DASHBOARD */
+  .dash-layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 57px)}
+  .sidebar{background:var(--bg2);border-right:1px solid var(--border);padding:24px 16px}
+  .sidebar-section{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.08em;margin:20px 0 8px;text-transform:uppercase}
+  .sidebar-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:14px;color:var(--muted);transition:all .2s;margin-bottom:2px}
+  .sidebar-item:hover,.sidebar-item.active{background:var(--bg3);color:var(--text)}
+  .sidebar-item.active{color:var(--purple)}
+  .main{padding:32px;overflow-y:auto}
+  .main h2{font-size:22px;font-weight:800;margin-bottom:6px}
+  .main .sub{font-size:14px;color:var(--muted);margin-bottom:28px}
+  /* STATS GRID */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+  .stat{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px}
+  .stat-label{font-size:12px;color:var(--muted);font-weight:600;margin-bottom:8px}
+  .stat-value{font-size:28px;font-weight:800}
+  .stat-delta{font-size:12px;margin-top:4px}
+  .up{color:var(--green)}.down{color:var(--red)}
+  /* WIDGETS TABLE */
+  .table-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:24px}
+  .table-header{display:flex;justify-content:space-between;align-items:center;padding:18px 20px;border-bottom:1px solid var(--border)}
+  .table-header h3{font-size:15px;font-weight:700}
+  .add-btn{padding:8px 16px;border-radius:8px;border:none;background:var(--purple);color:#fff;font-size:13px;font-weight:600;cursor:pointer}
+  table{width:100%;border-collapse:collapse}
+  th{padding:11px 20px;text-align:left;font-size:12px;font-weight:600;color:var(--muted);border-bottom:1px solid var(--border)}
+  td{padding:13px 20px;font-size:13px;border-bottom:1px solid var(--border)}
+  tr:last-child td{border-bottom:none}
+  tr:hover td{background:rgba(124,111,247,.05)}
+  .status-pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
+  .status-pill.active{background:rgba(34,201,122,.12);color:var(--green)}
+  .status-pill.paused{background:rgba(245,166,35,.12);color:var(--amber)}
+  /* EVENT LOG */
+  .event-log{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;max-height:340px;overflow-y:auto}
+  .event-log h3{font-size:15px;font-weight:700;margin-bottom:16px}
+  .event-item{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px}
+  .event-item:last-child{border-bottom:none}
+  .event-dot{width:8px;height:8px;border-radius:50%;margin-top:4px;flex-shrink:0}
+  .event-dot.track{background:var(--purple)}
+  .event-dot.identify{background:var(--blue)}
+  .event-dot.alias{background:var(--green)}
+  .event-dot.warn{background:var(--amber)}
+  .event-name{font-weight:600;margin-bottom:2px}
+  .event-props{color:var(--muted);font-size:12px;font-family:monospace}
+  .event-time{color:var(--muted);font-size:11px;margin-left:auto;flex-shrink:0}
+  /* DATA HEALTH */
+  .health-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:24px}
+  .health-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px}
+  .health-card h4{font-size:14px;font-weight:700;margin-bottom:14px}
+  .health-check{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+  .health-check:last-child{border-bottom:none}
+  .hc-icon{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
+  .hc-icon.pass{background:rgba(34,201,122,.15);color:var(--green)}
+  .hc-icon.fail{background:rgba(242,95,92,.15);color:var(--red)}
+  .hc-icon.warn{background:rgba(245,166,35,.15);color:var(--amber)}
+  .hc-label{flex:1}
+  .hc-badge{font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px}
+  .hc-badge.pass{background:rgba(34,201,122,.12);color:var(--green)}
+  .hc-badge.fail{background:rgba(242,95,92,.12);color:var(--red)}
+  .hc-badge.warn{background:rgba(245,166,35,.12);color:var(--amber)}
+  /* TOAST */
+  #toast{position:fixed;bottom:24px;right:24px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 18px;font-size:13px;display:none;z-index:999;max-width:320px;box-shadow:0 8px 32px rgba(0,0,0,.4)}
+  #toast.show{display:block;animation:fadeIn .2s ease}
+  /* TOKEN BANNER */
+  .token-banner{background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.3);border-radius:10px;padding:12px 16px;margin-bottom:20px;font-size:13px;color:var(--amber);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .token-banner input{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;font-size:13px;width:170px;outline:none}
+  .token-banner button{padding:6px 12px;border-radius:6px;border:none;background:var(--amber);color:#000;font-size:12px;font-weight:700;cursor:pointer}
+</style>
 </head>
 <body>
-<p class="p1"><span class="s1">&lt;!DOCTYPE html&gt;</span></p>
-<p class="p1"><span class="s1">&lt;html lang="en"&gt;</span></p>
-<p class="p1"><span class="s1">&lt;head&gt;</span></p>
-<p class="p1"><span class="s1">&lt;meta charset="UTF-8"&gt;</span></p>
-<p class="p1"><span class="s1">&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</span></p>
-<p class="p1"><span class="s1">&lt;title&gt;FeedbackPulse&lt;/title&gt;</span></p>
-<p class="p1"><span class="s1">&lt;script src="https://cdn.jsdelivr.net/npm/mixpanel-browser@2.47.0/dist/mixpanel.umd.js"&gt;&lt;/script&gt;</span></p>
-<p class="p1"><span class="s1">&lt;style&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>*{box-sizing:border-box;margin:0;padding:0}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>:root{</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>--bg:#0f1117;--bg2:#1a1d27;--bg3:#22263a;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>--border:#2e3350;--text:#e8eaf0;--muted:#7a7f99;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>--purple:#7c6ff7;--purple2:#5c56d4;--green:#22c97a;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>--red:#f25f5c;--amber:#f5a623;--blue:#4a9eff;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>body{font-family:system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>/* NAV */</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>nav{display:flex;align-items:center;justify-content:space-between;padding:14px 32px;border-bottom:1px solid var(--border);background:var(--bg2)}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.logo{font-size:18px;font-weight:700;color:var(--purple)}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.nav-links{display:flex;gap:8px}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.nav-btn{padding:7px 16px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:600;transition:all .2s}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.nav-btn.outline{background:transparent;border:1px solid var(--border);color:var(--text)}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.nav-btn.outline:hover{border-color:var(--purple);color:var(--purple)}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.nav-btn.primary{background:var(--purple);color:#fff}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.nav-btn.primary:hover{background:var(--purple2)}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>/* PAGES */</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.page{display:none;animation:fadeIn .25s ease}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.page.active{display:block}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>/* HERO */</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.hero{max-width:760px;margin:80px auto;text-align:center;padding:0 24px}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.hero h1{font-size:48px;font-weight:800;line-height:1.15;margin-bottom:16px}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.hero h1 span{color:var(--purple)}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.hero p{font-size:18px;color:var(--muted);margin-bottom:40px;line-height:1.6}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.btn-lg{padding:14px 32px;border-radius:10px;border:none;cursor:pointer;font-size:15px;font-weight:700;transition:all .2s}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.btn-lg.primary{background:var(--purple);color:#fff}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.btn-lg.primary:hover{background:var(--purple2);transform:translateY(-1px)}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.btn-lg.ghost{background:transparent;border:1px solid var(--border);color:var(--text)}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.btn-lg.ghost:hover{border-color:var(--purple);color:var(--purple)}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.features{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:900px;margin:60px auto 0;padding:0 24px}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.feature-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:24px}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.feature-card .icon{font-size:24px;margin-bottom:12px}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.feature-card h3{font-size:15px;font-weight:700;margin-bottom:8px}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.feature-card p{font-size:13px;color:var(--muted);line-height:1.5}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>/* PRICING */</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.pricing{max-width:860px;margin:60px auto;padding:0 24px}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.pricing h2{text-align:center;font-size:32px;font-weight:800;margin-bottom:40px}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.plan{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:28px;position:relative}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.plan.popular{border-color:var(--purple)}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--purple);color:#fff;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.plan-name{font-size:14px;color:var(--muted);font-weight:600;margin-bottom:8px}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.plan-price{font-size:36px;font-weight:800;margin-bottom:4px}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.plan-price span{font-size:14px;color:var(--muted);font-weight:400}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.plan-desc{font-size:13px;color:var(--muted);margin-bottom:24px}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.plan-features{list-style:none;margin-bottom:28px}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.plan-features li{font-size:13px;padding:6px 0;color:var(--muted);border-bottom:1px solid var(--border)}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.plan-features li::before{content:"✓ ";color:var(--green)}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.plan-btn{width:100%;padding:11px;border-radius:8px;border:none;cursor:pointer;font-size:14px;font-weight:700;transition:all .2s}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.plan-btn.primary{background:var(--purple);color:#fff}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.plan-btn.primary:hover{background:var(--purple2)}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.plan-btn.outline{background:transparent;border:1px solid var(--border);color:var(--text)}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.plan-btn.outline:hover{border-color:var(--purple);color:var(--purple)}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>/* AUTH */</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.auth-wrap{max-width:420px;margin:80px auto;padding:0 24px}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.auth-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:36px}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.auth-card h2{font-size:24px;font-weight:800;margin-bottom:6px}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.auth-card .sub{font-size:14px;color:var(--muted);margin-bottom:28px}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.field{margin-bottom:16px}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.field label{display:block;font-size:13px;font-weight:600;margin-bottom:6px;color:var(--muted)}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.field input,.field select{width:100%;padding:11px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;outline:none;transition:border .2s}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.field input:focus,.field select:focus{border-color:var(--purple)}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.submit-btn{width:100%;padding:13px;border-radius:10px;border:none;background:var(--purple);color:#fff;font-size:15px;font-weight:700;cursor:pointer;margin-top:8px;transition:all .2s}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.submit-btn:hover{background:var(--purple2)}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.auth-switch{text-align:center;margin-top:20px;font-size:13px;color:var(--muted)}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.auth-switch a{color:var(--purple);cursor:pointer;text-decoration:none}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>/* DASHBOARD */</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.dash-layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 57px)}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.sidebar{background:var(--bg2);border-right:1px solid var(--border);padding:24px 16px}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.sidebar-section{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.08em;margin:20px 0 8px;text-transform:uppercase}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.sidebar-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:14px;color:var(--muted);transition:all .2s;margin-bottom:2px}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.sidebar-item:hover,.sidebar-item.active{background:var(--bg3);color:var(--text)}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.sidebar-item.active{color:var(--purple)}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.main{padding:32px;overflow-y:auto}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.main h2{font-size:22px;font-weight:800;margin-bottom:6px}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.main .sub{font-size:14px;color:var(--muted);margin-bottom:28px}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>/* STATS GRID */</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.stat{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.stat-label{font-size:12px;color:var(--muted);font-weight:600;margin-bottom:8px}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.stat-value{font-size:28px;font-weight:800}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.stat-delta{font-size:12px;margin-top:4px}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.up{color:var(--green)}.down{color:var(--red)}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>/* WIDGETS TABLE */</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.table-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:24px}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.table-header{display:flex;justify-content:space-between;align-items:center;padding:18px 20px;border-bottom:1px solid var(--border)}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.table-header h3{font-size:15px;font-weight:700}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.add-btn{padding:8px 16px;border-radius:8px;border:none;background:var(--purple);color:#fff;font-size:13px;font-weight:600;cursor:pointer}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>table{width:100%;border-collapse:collapse}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>th{padding:11px 20px;text-align:left;font-size:12px;font-weight:600;color:var(--muted);border-bottom:1px solid var(--border)}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>td{padding:13px 20px;font-size:13px;border-bottom:1px solid var(--border)}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>tr:last-child td{border-bottom:none}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>tr:hover td{background:rgba(124,111,247,.05)}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.status-pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.status-pill.active{background:rgba(34,201,122,.12);color:var(--green)}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.status-pill.paused{background:rgba(245,166,35,.12);color:var(--amber)}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>/* EVENT LOG */</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.event-log{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;max-height:340px;overflow-y:auto}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.event-log h3{font-size:15px;font-weight:700;margin-bottom:16px}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.event-item{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.event-item:last-child{border-bottom:none}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.event-dot{width:8px;height:8px;border-radius:50%;margin-top:4px;flex-shrink:0}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.event-dot.track{background:var(--purple)}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.event-dot.identify{background:var(--blue)}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.event-dot.alias{background:var(--green)}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.event-dot.warn{background:var(--amber)}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.event-name{font-weight:600;margin-bottom:2px}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.event-props{color:var(--muted);font-size:12px;font-family:monospace}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.event-time{color:var(--muted);font-size:11px;margin-left:auto;flex-shrink:0}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>/* DATA HEALTH */</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.health-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:24px}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.health-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.health-card h4{font-size:14px;font-weight:700;margin-bottom:14px}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.health-check{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.health-check:last-child{border-bottom:none}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.hc-icon{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.hc-icon.pass{background:rgba(34,201,122,.15);color:var(--green)}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.hc-icon.fail{background:rgba(242,95,92,.15);color:var(--red)}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.hc-icon.warn{background:rgba(245,166,35,.15);color:var(--amber)}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.hc-label{flex:1}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.hc-badge{font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.hc-badge.pass{background:rgba(34,201,122,.12);color:var(--green)}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.hc-badge.fail{background:rgba(242,95,92,.12);color:var(--red)}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.hc-badge.warn{background:rgba(245,166,35,.12);color:var(--amber)}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>/* TOAST */</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>#toast{position:fixed;bottom:24px;right:24px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 18px;font-size:13px;display:none;z-index:999;max-width:320px;box-shadow:0 8px 32px rgba(0,0,0,.4)}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>#toast.show{display:block;animation:fadeIn .2s ease}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>/* TOKEN BANNER */</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.token-banner{background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.3);border-radius:10px;padding:12px 16px;margin-bottom:20px;font-size:13px;color:var(--amber);display:flex;align-items:center;gap:10px}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.token-banner input{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:6px;font-size:13px;width:260px;outline:none}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.token-banner button{padding:6px 12px;border-radius:6px;border:none;background:var(--amber);color:#000;font-size:12px;font-weight:700;cursor:pointer}</span></p>
-<p class="p1"><span class="s1">&lt;/style&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/head&gt;</span></p>
-<p class="p1"><span class="s1">&lt;body&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">&lt;!-- NAV --&gt;</span></p>
-<p class="p1"><span class="s1">&lt;nav&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;div class="logo"&gt;⚡ FeedbackPulse&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;div class="nav-links" id="nav-public"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;button class="nav-btn outline" onclick="showPage('pricing');mp('Pricing_viewed',{from:'nav'})"&gt;Pricing&lt;/button&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;button class="nav-btn outline" onclick="showPage('login');mp('Login_page_viewed',{})"&gt;Log in&lt;/button&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;button class="nav-btn primary" onclick="showPage('signup');mp('Signup_page_viewed',{from:'nav_cta'})"&gt;Get started free&lt;/button&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;div class="nav-links" id="nav-dash" style="display:none"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;span style="font-size:13px;color:var(--muted);margin-right:8px" id="user-label"&gt;&lt;/span&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;button class="nav-btn outline" onclick="logout()"&gt;Log out&lt;/button&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/nav&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">&lt;!-- LANDING --&gt;</span></p>
-<p class="p1"><span class="s1">&lt;div class="page active" id="page-landing"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;div class="hero"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;h1&gt;Collect feedback.&lt;br&gt;&lt;span&gt;Ship faster.&lt;/span&gt;&lt;/h1&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;p&gt;Embed a beautiful feedback widget on your product in 60 seconds. Understand what users love, hate, and need — powered by AI analytics.&lt;/p&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div class="hero-btns"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;button class="btn-lg primary" onclick="showPage('signup');mp('Signup_page_viewed',{from:'hero_cta'})"&gt;Start for free&lt;/button&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;button class="btn-lg ghost" onclick="showPage('pricing');mp('Pricing_viewed',{from:'hero'})"&gt;See pricing&lt;/button&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;div class="features"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div class="feature-card"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="icon"&gt;🎯&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;h3&gt;One-line embed&lt;/h3&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;p&gt;Drop a single script tag into any site. Works with React, WordPress, Webflow — everything.&lt;/p&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div class="feature-card"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="icon"&gt;📊&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;h3&gt;Real-time dashboard&lt;/h3&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;p&gt;See responses the moment they arrive. Filter by rating, date, and user segment instantly.&lt;/p&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div class="feature-card"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="icon"&gt;🤖&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;h3&gt;AI insights&lt;/h3&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;p&gt;Our agent reads your Mixpanel data and surfaces what's driving churn before you lose users.&lt;/p&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">&lt;!-- PRICING --&gt;</span></p>
-<p class="p1"><span class="s1">&lt;div class="page" id="page-pricing"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;div class="pricing"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;h2&gt;Simple, honest pricing&lt;/h2&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div class="plans"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="plan"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="plan-name"&gt;Starter&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="plan-price"&gt;$0 &lt;span&gt;/ mo&lt;/span&gt;&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="plan-desc"&gt;Perfect for side projects&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;ul class="plan-features"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;li&gt;1 widget&lt;/li&gt;&lt;li&gt;100 responses/mo&lt;/li&gt;&lt;li&gt;Basic dashboard&lt;/li&gt;&lt;li&gt;Email support&lt;/li&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/ul&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;button class="plan-btn outline" onclick="showPage('signup');mp('Plan_selected',{plan:'starter',from:'pricing'})"&gt;Get started&lt;/button&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="plan popular"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="badge"&gt;MOST POPULAR&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="plan-name"&gt;Pro&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="plan-price"&gt;$29 &lt;span&gt;/ mo&lt;/span&gt;&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="plan-desc"&gt;For growing products&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;ul class="plan-features"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;li&gt;10 widgets&lt;/li&gt;&lt;li&gt;5,000 responses/mo&lt;/li&gt;&lt;li&gt;AI insights&lt;/li&gt;&lt;li&gt;Mixpanel sync&lt;/li&gt;&lt;li&gt;Priority support&lt;/li&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/ul&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;button class="plan-btn primary" onclick="showPage('signup');mp('Plan_selected',{plan:'pro',from:'pricing'})"&gt;Start free trial&lt;/button&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="plan"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="plan-name"&gt;Enterprise&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="plan-price"&gt;$99 &lt;span&gt;/ mo&lt;/span&gt;&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="plan-desc"&gt;For scaling teams&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;ul class="plan-features"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;li&gt;Unlimited widgets&lt;/li&gt;&lt;li&gt;Unlimited responses&lt;/li&gt;&lt;li&gt;Custom AI agent&lt;/li&gt;&lt;li&gt;Slack alerts&lt;/li&gt;&lt;li&gt;Dedicated CSM&lt;/li&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/ul&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;button class="plan-btn outline" onclick="mp('Plan_selected',{plan:'enterprise',from:'pricing'});showPage('signup')"&gt;Contact sales&lt;/button&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">&lt;!-- LOGIN --&gt;</span></p>
-<p class="p1"><span class="s1">&lt;div class="page" id="page-login"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;div class="auth-wrap"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div class="auth-card"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;h2&gt;Welcome back&lt;/h2&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="sub"&gt;Log into your FeedbackPulse account&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="field"&gt;&lt;label&gt;Email&lt;/label&gt;&lt;input type="email" id="login-email" placeholder="you@company.com"&gt;&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="field"&gt;&lt;label&gt;Password&lt;/label&gt;&lt;input type="password" id="login-pass" placeholder="••••••••"&gt;&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;button class="submit-btn" onclick="doLogin()"&gt;Log in&lt;/button&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="auth-switch"&gt;Don't have an account? &lt;a onclick="showPage('signup')"&gt;Sign up free&lt;/a&gt;&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">&lt;!-- SIGNUP --&gt;</span></p>
-<p class="p1"><span class="s1">&lt;div class="page" id="page-signup"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;div class="auth-wrap"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div class="auth-card"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;h2&gt;Create your account&lt;/h2&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="sub"&gt;Start collecting feedback in minutes&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="field"&gt;&lt;label&gt;Full name&lt;/label&gt;&lt;input type="text" id="signup-name" placeholder="Ada Lovelace"&gt;&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="field"&gt;&lt;label&gt;Work email&lt;/label&gt;&lt;input type="email" id="signup-email" placeholder="ada@company.com"&gt;&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="field"&gt;&lt;label&gt;Company&lt;/label&gt;&lt;input type="text" id="signup-company" placeholder="Acme Inc."&gt;&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="field"&gt;&lt;label&gt;Plan&lt;/label&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;select id="signup-plan"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;option value="starter"&gt;Starter — Free&lt;/option&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;option value="pro"&gt;Pro — $29/mo&lt;/option&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;option value="enterprise"&gt;Enterprise — $99/mo&lt;/option&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/select&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;button class="submit-btn" onclick="doSignup()"&gt;Create account&lt;/button&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="auth-switch"&gt;Already have an account? &lt;a onclick="showPage('login')"&gt;Log in&lt;/a&gt;&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">&lt;!-- DASHBOARD --&gt;</span></p>
-<p class="p1"><span class="s1">&lt;div class="page" id="page-dashboard"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;div class="dash-layout"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div class="sidebar"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="sidebar-section"&gt;Main&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="sidebar-item active" id="sb-overview" onclick="showSection('overview');mp('Dashboard_section_viewed',{section:'overview'})"&gt;📊 Overview&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="sidebar-item" id="sb-widgets" onclick="showSection('widgets');mp('Dashboard_section_viewed',{section:'widgets'})"&gt;🧩 Widgets&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="sidebar-item" id="sb-responses" onclick="showSection('responses');mp('Dashboard_section_viewed',{section:'responses'})"&gt;💬 Responses&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="sidebar-section"&gt;Analytics&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="sidebar-item" id="sb-health" onclick="showSection('health');mp('Dashboard_section_viewed',{section:'data_health'})"&gt;🏥 Data health&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="sidebar-item" id="sb-events" onclick="showSection('events');mp('Dashboard_section_viewed',{section:'event_log'})"&gt;⚡ Event log&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="sidebar-section"&gt;Account&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="sidebar-item" onclick="mp('Upgrade_clicked',{from:'sidebar'});showToast('💳 Billing page — coming soon!')"&gt;💳 Upgrade&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="sidebar-item" onclick="mp('Settings_viewed',{})"&gt;⚙️ Settings&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div class="main"&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;!-- OVERVIEW SECTION --&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div id="section-overview"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;h2&gt;Overview&lt;/h2&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="sub"&gt;Your product health at a glance&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="stats"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="stat"&gt;&lt;div class="stat-label"&gt;Total users&lt;/div&gt;&lt;div class="stat-value" id="s-users"&gt;0&lt;/div&gt;&lt;div class="stat-delta up" id="s-users-d"&gt;&lt;/div&gt;&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="stat"&gt;&lt;div class="stat-label"&gt;Active widgets&lt;/div&gt;&lt;div class="stat-value" id="s-widgets"&gt;0&lt;/div&gt;&lt;div class="stat-delta up" id="s-widgets-d"&gt;&lt;/div&gt;&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="stat"&gt;&lt;div class="stat-label"&gt;Responses (30d)&lt;/div&gt;&lt;div class="stat-value" id="s-responses"&gt;0&lt;/div&gt;&lt;div class="stat-delta up" id="s-resp-d"&gt;&lt;/div&gt;&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="stat"&gt;&lt;div class="stat-label"&gt;MRR&lt;/div&gt;&lt;div class="stat-value" id="s-mrr"&gt;$0&lt;/div&gt;&lt;div class="stat-delta" id="s-mrr-d"&gt;&lt;/div&gt;&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="table-card"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="table-header"&gt;&lt;h3&gt;Recent activity&lt;/h3&gt;&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;table&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;tr&gt;&lt;th&gt;Event&lt;/th&gt;&lt;th&gt;User&lt;/th&gt;&lt;th&gt;Time&lt;/th&gt;&lt;th&gt;Plan&lt;/th&gt;&lt;/tr&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;tbody id="activity-tbody"&gt;&lt;/tbody&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;/table&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;!-- WIDGETS SECTION --&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div id="section-widgets" style="display:none"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;h2&gt;Widgets&lt;/h2&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="sub"&gt;Manage your feedback widgets&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="table-card"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="table-header"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;h3&gt;Your widgets&lt;/h3&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;button class="add-btn" onclick="addWidget()"&gt;+ New widget&lt;/button&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;table&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;tr&gt;&lt;th&gt;Widget name&lt;/th&gt;&lt;th&gt;Site&lt;/th&gt;&lt;th&gt;Responses&lt;/th&gt;&lt;th&gt;Status&lt;/th&gt;&lt;th&gt;Action&lt;/th&gt;&lt;/tr&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;tbody id="widgets-tbody"&gt;&lt;/tbody&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;/table&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;!-- RESPONSES SECTION --&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div id="section-responses" style="display:none"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;h2&gt;Responses&lt;/h2&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="sub"&gt;All feedback collected by your widgets&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="table-card"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;table&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;tr&gt;&lt;th&gt;Rating&lt;/th&gt;&lt;th&gt;Message&lt;/th&gt;&lt;th&gt;Widget&lt;/th&gt;&lt;th&gt;Time&lt;/th&gt;&lt;/tr&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;tbody id="responses-tbody"&gt;&lt;/tbody&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;/table&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;!-- DATA HEALTH SECTION --&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div id="section-health" style="display:none"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;h2&gt;Data health&lt;/h2&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="sub"&gt;Validate your Mixpanel event schema and data quality&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="health-grid" id="health-grid"&gt;&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;!-- EVENT LOG --&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div id="section-events" style="display:none"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;h2&gt;Event log&lt;/h2&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="sub"&gt;Live stream of all Mixpanel events fired by this session&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="event-log" id="event-log-list"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;h3&gt;Fired events&lt;/h3&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div id="event-entries"&gt;&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">&lt;div id="toast"&gt;&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">&lt;script&gt;</span></p>
-<p class="p1"><span class="s1">// ─── CONFIG ───────────────────────────────────────────────────────</span></p>
-<p class="p1"><span class="s1">let MIXPANEL_TOKEN = '27d60700d0e7ce4f22b4785b12ead0aa';</span></p>
-<p class="p1"><span class="s1">let useMock = true;</span></p>
-<p class="p1"><span class="s1">let currentUser = null;</span></p>
-<p class="p1"><span class="s1">const eventLog = [];</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">// ─── MIXPANEL INIT ────────────────────────────────────────────────</span></p>
-<p class="p1"><span class="s1">function initMixpanel(token) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>if (!token || token === 'PASTE_YOUR_TOKEN_HERE') { useMock = true; return; }</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>try {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>mixpanel.init(token, { debug: false, track_pageview: false, persistence: 'localStorage' });</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>useMock = false;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>console.log('[FeedbackPulse] Mixpanel initialised with real token');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>} catch(e) { useMock = true; }</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p1"><span class="s1">initMixpanel(MIXPANEL_TOKEN);</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">// ─── CORE TRACKING FUNCTION ────────────────────────────────────────</span></p>
-<p class="p1"><span class="s1">function mp(event, props = {}) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const enriched = {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>...props,</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>timestamp: new Date().toISOString(),</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>app: 'FeedbackPulse',</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>user_plan: currentUser?.plan || 'anonymous',</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>session_id: sessionId,</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>// Data health fields</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>has_user_id: !!currentUser?.id,</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>has_plan: !!currentUser?.plan,</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>schema_version: '1.0'</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>};</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>// Fire to real Mixpanel if token set</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>if (!useMock) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>try { mixpanel.track(event, enriched); } catch(e) {}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>// Always log locally</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>logEvent(event, enriched);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>console.log(`[MP] ${event}`, enriched);</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">function mpIdentify(userId, traits = {}) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>if (!useMock) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>try {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>mixpanel.identify(userId);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>mixpanel.people.set({ ...traits, $last_login: new Date() });</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>} catch(e) {}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>logEvent('identify', { distinct_id: userId, ...traits }, 'identify');</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">// ─── SESSION ──────────────────────────────────────────────────────</span></p>
-<p class="p1"><span class="s1">const sessionId = 'sess_' + Math.random().toString(36).slice(2,9);</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">// ─── SIMULATED SEED DATA ──────────────────────────────────────────</span></p>
-<p class="p1"><span class="s1">const seedUsers = [</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>{email:'priya@acme.com',name:'Priya S',plan:'pro'},{email:'tom@startup.io',name:'Tom B',plan:'starter'},</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>{email:'mia@corp.co',name:'Mia L',plan:'enterprise'},{email:'raj@saas.dev',name:'Raj K',plan:'pro'},</span></p>
-<p class="p1"><span class="s1">];</span></p>
-<p class="p1"><span class="s1">const seedWidgets = [</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>{name:'Homepage CTA',site:'acme.com',responses:342,status:'active'},</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>{name:'Onboarding flow',site:'acme.com',responses:187,status:'active'},</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>{name:'Pricing page',site:'acme.com',responses:89,status:'paused'},</span></p>
-<p class="p1"><span class="s1">];</span></p>
-<p class="p1"><span class="s1">const seedResponses = [</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>{rating:'⭐⭐⭐⭐⭐',msg:'Super easy to set up!',widget:'Homepage CTA',time:'2m ago'},</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>{rating:'⭐⭐⭐⭐',msg:'Would love Slack integration',widget:'Onboarding flow',time:'8m ago'},</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>{rating:'⭐⭐⭐',msg:'Dashboard is a bit slow on mobile',widget:'Pricing page',time:'15m ago'},</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>{rating:'⭐⭐⭐⭐⭐',msg:'Best feedback tool I've used',widget:'Homepage CTA',time:'22m ago'},</span></p>
-<p class="p1"><span class="s1">];</span></p>
-<p class="p1"><span class="s1">const recentActivity = [</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>{event:'User_signed_up',user:'priya@acme.com',time:'1m ago',plan:'Pro'},</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>{event:'Widget_created',user:'tom@startup.io',time:'5m ago',plan:'Starter'},</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>{event:'Plan_upgraded',user:'mia@corp.co',time:'12m ago',plan:'Enterprise'},</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>{event:'Response_received',user:'raj@saas.dev',time:'18m ago',plan:'Pro'},</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>{event:'Feature_used',user:'priya@acme.com',time:'24m ago',plan:'Pro'},</span></p>
-<p class="p1"><span class="s1">];</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">// ─── DATA HEALTH CHECKS ────────────────────────────────────────────</span></p>
-<p class="p1"><span class="s1">// This is your data health module — each check validates event schema + quality</span></p>
-<p class="p1"><span class="s1">const healthChecks = [</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>{</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>category: 'Event schema',</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>checks: [</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>{ label: 'All events have timestamp', status: 'pass', detail: '100% coverage' },</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>{ label: 'All events have schema_version', status: 'pass', detail: 'v1.0 on all events' },</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>{ label: 'All events have app identifier', status: 'pass', detail: 'FeedbackPulse set' },</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>{ label: 'Event names use snake_case', status: 'pass', detail: 'Naming convention OK' },</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>]</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>},</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>{</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>category: 'User identity',</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>checks: [</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>{ label: 'identify() called on login', status: 'pass', detail: 'Seen on 100% of logins' },</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>{ label: 'User plan attached to events', status: 'pass', detail: 'has_plan = true' },</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>{ label: 'Anonymous events before signup', status: 'warn', detail: '18% events pre-identify' },</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>{ label: 'User ID format consistent', status: 'pass', detail: 'usr_xxx pattern' },</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>]</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>},</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>{</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>category: 'Funnel coverage',</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>checks: [</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>{ label: 'Signup_page_viewed tracked', status: 'pass', detail: 'Event fired' },</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>{ label: 'User_signed_up tracked', status: 'pass', detail: 'Event fired' },</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>{ label: 'Widget_created tracked', status: 'pass', detail: 'Event fired' },</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>{ label: 'Plan_upgraded tracked', status: 'pass', detail: 'Event fired' },</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>{ label: 'Subscription_cancelled tracked', status: 'warn', detail: 'Not yet fired this session' },</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>]</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>},</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>{</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>category: 'Data completeness',</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>checks: [</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>{ label: 'session_id on all events', status: 'pass', detail: 'session_id present' },</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>{ label: 'No duplicate events', status: 'pass', detail: '0 duplicates detected' },</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>{ label: 'Revenue events have plan prop', status: 'pass', detail: 'user_plan always set' },</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>{ label: 'Events fire within 2s of action', status: 'pass', detail: 'Avg latency: 12ms' },</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>]</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
-<p class="p1"><span class="s1">];</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">// ─── PAGE ROUTER ──────────────────────────────────────────────────</span></p>
-<p class="p1"><span class="s1">function showPage(name) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>document.querySelectorAll('.page').forEach(p =&gt; p.classList.remove('active'));</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>document.getElementById('page-' + name).classList.add('active');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>if (name === 'dashboard') {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>document.getElementById('nav-public').style.display = 'none';</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>document.getElementById('nav-dash').style.display = 'flex';</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>renderDashboard();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">function showSection(name) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>['overview','widgets','responses','health','events'].forEach(s =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>document.getElementById('section-' + s).style.display = s === name ? 'block' : 'none';</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const sb = document.getElementById('sb-' + s);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>if (sb) sb.classList.toggle('active', s === name);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>});</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>if (name === 'health') renderHealth();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>if (name === 'events') renderEventLog();</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">// ─── AUTH ─────────────────────────────────────────────────────────</span></p>
-<p class="p1"><span class="s1">function doSignup() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const name = document.getElementById('signup-name').value || 'Demo User';</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const email = document.getElementById('signup-email').value || 'demo@example.com';</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const company = document.getElementById('signup-company').value || 'Demo Co';</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const plan = document.getElementById('signup-plan').value;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const userId = 'usr_' + Math.random().toString(36).slice(2,9);</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>currentUser = { id: userId, name, email, company, plan };</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>document.getElementById('user-label').textContent = name;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>// MIXPANEL: Identify user + track signup</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>mpIdentify(userId, { $name: name, $email: email, company, plan, created_at: new Date().toISOString() });</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>mp('User_signed_up', { user_id: userId, name, email, company, plan, method: 'email' });</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>mp('Onboarding_started', { user_id: userId, plan });</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>showPage('dashboard');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>showToast('🎉 Welcome to FeedbackPulse, ' + name + '!');</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">function doLogin() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const email = document.getElementById('login-email').value || 'demo@example.com';</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const userId = 'usr_' + Math.random().toString(36).slice(2,7);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>currentUser = { id: userId, name: email.split('@')[0], email, plan: 'pro' };</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>document.getElementById('user-label').textContent = currentUser.name;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>mpIdentify(userId, { $email: email, plan: 'pro' });</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>mp('User_logged_in', { user_id: userId, email, method: 'email' });</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>showPage('dashboard');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>showToast('👋 Welcome back!');</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">function logout() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>mp('User_logged_out', { user_id: currentUser?.id });</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>currentUser = null;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>document.getElementById('nav-public').style.display = 'flex';</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>document.getElementById('nav-dash').style.display = 'none';</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>showPage('landing');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>showToast('Logged out successfully');</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">// ─── DASHBOARD RENDER ─────────────────────────────────────────────</span></p>
-<p class="p1"><span class="s1">function renderDashboard() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>// Stats</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>animateCount('s-users', 1284, '');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>animateCount('s-widgets', 3, '');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>animateCount('s-responses', 618, '');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>animateCount('s-mrr', 1247, '$');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>document.getElementById('s-users-d').textContent = '↑ 12% vs last month';</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>document.getElementById('s-widgets-d').textContent = '↑ 1 this week';</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>document.getElementById('s-resp-d').textContent = '↑ 23% vs last month';</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const mrrEl = document.getElementById('s-mrr-d');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>mrrEl.textContent = '↑ 8% vs last month'; mrrEl.className = 'stat-delta up';</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>// Activity table</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const tbody = document.getElementById('activity-tbody');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>tbody.innerHTML = recentActivity.map(r =&gt; `</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;tr&gt;&lt;td&gt;&lt;strong&gt;${r.event}&lt;/strong&gt;&lt;/td&gt;&lt;td&gt;${r.user}&lt;/td&gt;&lt;td style="color:var(--muted)"&gt;${r.time}&lt;/td&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;td&gt;&lt;span class="status-pill active"&gt;${r.plan}&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;`).join('');</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>// Widgets table</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const wtbody = document.getElementById('widgets-tbody');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>wtbody.innerHTML = seedWidgets.map((w,i) =&gt; `</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;tr&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;td&gt;&lt;strong&gt;${w.name}&lt;/strong&gt;&lt;/td&gt;&lt;td style="color:var(--muted)"&gt;${w.site}&lt;/td&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;td&gt;${w.responses}&lt;/td&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;td&gt;&lt;span class="status-pill ${w.status}"&gt;${w.status}&lt;/span&gt;&lt;/td&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;td&gt;&lt;button style="background:none;border:1px solid var(--border);color:var(--muted);padding:4px 10px;border-radius:6px;cursor:pointer;font-size:12px"</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>onclick="mp('Widget_settings_opened',{widget_id:'wgt_${i}',widget_name:'${w.name}'});showToast('Widget editor — coming soon!')"&gt;Edit&lt;/button&gt;&lt;/td&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/tr&gt;`).join('');</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>// Responses</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const rtbody = document.getElementById('responses-tbody');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>rtbody.innerHTML = seedResponses.map(r =&gt; `</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;tr&gt;&lt;td&gt;${r.rating}&lt;/td&gt;&lt;td&gt;${r.msg}&lt;/td&gt;&lt;td style="color:var(--muted)"&gt;${r.widget}&lt;/td&gt;&lt;td style="color:var(--muted)"&gt;${r.time}&lt;/td&gt;&lt;/tr&gt;`).join('');</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">function addWidget() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const names = ['Exit intent','Post-signup','Feature gate','NPS survey'];</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const name = names[Math.floor(Math.random()*names.length)];</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const id = 'wgt_' + Math.random().toString(36).slice(2,7);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>mp('Widget_created', { widget_id: id, widget_name: name, user_id: currentUser?.id, plan: currentUser?.plan });</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>seedWidgets.unshift({name, site: currentUser?.company?.toLowerCase().replace(' ','') + '.com' || 'mysite.com', responses: 0, status: 'active'});</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>animateCount('s-widgets', seedWidgets.filter(w=&gt;w.status==='active').length, '');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>document.getElementById('widgets-tbody').innerHTML = seedWidgets.map((w,i)=&gt;`</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;tr&gt;&lt;td&gt;&lt;strong&gt;${w.name}&lt;/strong&gt;&lt;/td&gt;&lt;td style="color:var(--muted)"&gt;${w.site}&lt;/td&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;td&gt;${w.responses}&lt;/td&gt;&lt;td&gt;&lt;span class="status-pill ${w.status}"&gt;${w.status}&lt;/span&gt;&lt;/td&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;td&gt;&lt;button style="background:none;border:1px solid var(--border);color:var(--muted);padding:4px 10px;border-radius:6px;cursor:pointer;font-size:12px"</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>onclick="mp('Widget_settings_opened',{widget_id:'wgt_${i}',widget_name:'${w.name}'});showToast('Widget editor — coming soon!')"&gt;Edit&lt;/button&gt;&lt;/td&gt;&lt;/tr&gt;`).join('');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>showToast('✅ Widget "' + name + '" created!');</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">// ─── DATA HEALTH RENDER ────────────────────────────────────────────</span></p>
-<p class="p1"><span class="s1">function renderHealth() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const grid = document.getElementById('health-grid');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>grid.innerHTML = healthChecks.map(cat =&gt; `</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div class="health-card"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;h4&gt;${cat.category}&lt;/h4&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>${cat.checks.map(c =&gt; `</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="health-check"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="hc-icon ${c.status}"&gt;${c.status==='pass'?'✓':c.status==='fail'?'✕':'!'}&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="hc-label"&gt;${c.label}&lt;div style="font-size:11px;color:var(--muted);margin-top:2px"&gt;${c.detail}&lt;/div&gt;&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;span class="hc-badge ${c.status}"&gt;${c.status.toUpperCase()}&lt;/span&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;`).join('')}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;`).join('');</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>mp('Data_health_viewed', {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>total_checks: healthChecks.flatMap(c=&gt;c.checks).length,</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>passing: healthChecks.flatMap(c=&gt;c.checks).filter(c=&gt;c.status==='pass').length,</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>warnings: healthChecks.flatMap(c=&gt;c.checks).filter(c=&gt;c.status==='warn').length,</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>failing: healthChecks.flatMap(c=&gt;c.checks).filter(c=&gt;c.status==='fail').length,</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>});</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">// ─── EVENT LOG ────────────────────────────────────────────────────</span></p>
-<p class="p1"><span class="s1">function logEvent(name, props, type='track') {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>eventLog.unshift({ name, props, type, time: new Date().toLocaleTimeString() });</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>if (eventLog.length &gt; 50) eventLog.pop();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>renderEventLog();</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">function renderEventLog() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const el = document.getElementById('event-entries');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>if (!el) return;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>el.innerHTML = eventLog.map(e =&gt; `</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div class="event-item"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="event-dot ${e.type}"&gt;&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div style="flex:1"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="event-name"&gt;${e.name}&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="event-props"&gt;${JSON.stringify(e.props, null, 0).slice(0,120)}...&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="event-time"&gt;${e.time}&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;`).join('') || '&lt;div style="color:var(--muted);font-size:13px"&gt;No events yet. Interact with the app!&lt;/div&gt;';</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">// ─── HELPERS ──────────────────────────────────────────────────────</span></p>
-<p class="p1"><span class="s1">function animateCount(id, target, prefix='') {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const el = document.getElementById(id); if (!el) return;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>let cur = 0; const step = Math.ceil(target / 40);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const t = setInterval(() =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>cur = Math.min(cur + step, target);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>el.textContent = prefix + cur.toLocaleString();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>if (cur &gt;= target) clearInterval(t);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}, 30);</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">function showToast(msg) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const t = document.getElementById('toast');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>t.textContent = msg; t.classList.add('show');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>setTimeout(() =&gt; t.classList.remove('show'), 3000);</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">function setToken() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const val = document.getElementById('token-input').value.trim();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>if (!val) return;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>MIXPANEL_TOKEN = val;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>initMixpanel(val);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>document.getElementById('token-banner').innerHTML = '✅ Connected to Mixpanel! Events are now firing to your real project.';</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>document.getElementById('token-banner').style.background = 'rgba(34,201,122,.1)';</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>document.getElementById('token-banner').style.borderColor = 'rgba(34,201,122,.3)';</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>document.getElementById('token-banner').style.color = 'var(--green)';</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>mp('Mixpanel_token_connected', { token_length: val.length });</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">// ─── BOOT ─────────────────────────────────────────────────────────</span></p>
-<p class="p1"><span class="s1">mp('App_loaded', { page: 'landing', referrer: document.referrer || 'direct' });</span></p>
-<p class="p1"><span class="s1">&lt;/script&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/body&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/html&gt;</span></p>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">⚡ FeedbackPulse</div>
+  <div class="nav-links" id="nav-public">
+  <button class="nav-btn outline" onclick="showPage('pricing');mp('Pricing_viewed',{from:'nav'})">Pricing</button>
+  <button class="nav-btn outline" onclick="showPage('login');mp('Login_page_viewed',{})">Log in</button>
+  <button class="nav-btn primary" onclick="showPage('signup');mp('Signup_page_viewed',{from:'nav_cta'})">Get started free</button>
+  </div>
+  <div class="nav-links" id="nav-dash" style="display:none">
+  <span style="font-size:13px;color:var(--muted);margin-right:8px" id="user-label"></span>
+  <button class="nav-btn outline" onclick="logout()">Log out</button>
+  </div>
+</nav>
+
+<!-- LANDING -->
+<div class="page active" id="page-landing">
+  <div class="hero">
+  <h1>Collect feedback.<br><span>Ship faster.</span></h1>
+  <p>Embed a beautiful feedback widget on your product in 60 seconds. Understand what users love, hate, and need — powered by AI analytics.</p>
+  <div class="hero-btns">
+  <button class="btn-lg primary" onclick="showPage('signup');mp('Signup_page_viewed',{from:'hero_cta'})">Start for free</button>
+  <button class="btn-lg ghost" onclick="showPage('pricing');mp('Pricing_viewed',{from:'hero'})">See pricing</button>
+  </div>
+  </div>
+  <div class="features">
+  <div class="feature-card">
+  <div class="icon">🎯</div>
+  <h3>One-line embed</h3>
+  <p>Drop a single script tag into any site. Works with React, WordPress, Webflow — everything.</p>
+  </div>
+  <div class="feature-card">
+  <div class="icon">📊</div>
+  <h3>Real-time dashboard</h3>
+  <p>See responses the moment they arrive. Filter by rating, date, and user segment instantly.</p>
+  </div>
+  <div class="feature-card">
+  <div class="icon">🤖</div>
+  <h3>AI insights</h3>
+  <p>Our agent reads your Mixpanel data and surfaces what's driving churn before you lose users.</p>
+  </div>
+  </div>
+</div>
+
+<!-- PRICING -->
+<div class="page" id="page-pricing">
+  <div class="pricing">
+  <h2>Simple, honest pricing</h2>
+  <div class="plans">
+  <div class="plan">
+  <div class="plan-name">Starter</div>
+  <div class="plan-price">$0 <span>/ mo</span></div>
+  <div class="plan-desc">Perfect for side projects</div>
+  <ul class="plan-features">
+  <li>1 widget</li><li>100 responses/mo</li><li>Basic dashboard</li><li>Email support</li>
+  </ul>
+  <button class="plan-btn outline" onclick="showPage('signup');mp('Plan_selected',{plan:'starter',from:'pricing'})">Get started</button>
+  </div>
+  <div class="plan popular">
+  <div class="badge">MOST POPULAR</div>
+  <div class="plan-name">Pro</div>
+  <div class="plan-price">$29 <span>/ mo</span></div>
+  <div class="plan-desc">For growing products</div>
+  <ul class="plan-features">
+  <li>10 widgets</li><li>5,000 responses/mo</li><li>AI insights</li><li>Mixpanel sync</li><li>Priority support</li>
+  </ul>
+  <button class="plan-btn primary" onclick="showPage('signup');mp('Plan_selected',{plan:'pro',from:'pricing'})">Start free trial</button>
+  </div>
+  <div class="plan">
+  <div class="plan-name">Enterprise</div>
+  <div class="plan-price">$99 <span>/ mo</span></div>
+  <div class="plan-desc">For scaling teams</div>
+  <ul class="plan-features">
+  <li>Unlimited widgets</li><li>Unlimited responses</li><li>Custom AI agent</li><li>Slack alerts</li><li>Dedicated CSM</li>
+  </ul>
+  <button class="plan-btn outline" onclick="mp('Plan_selected',{plan:'enterprise',from:'pricing'});showPage('signup')">Contact sales</button>
+  </div>
+  </div>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div class="page" id="page-login">
+  <div class="auth-wrap">
+  <div class="auth-card">
+  <h2>Welcome back</h2>
+  <div class="sub">Log into your FeedbackPulse account</div>
+  <div class="field"><label>Email</label><input type="email" id="login-email" placeholder="you@company.com"></div>
+  <div class="field"><label>Password</label><input type="password" id="login-pass" placeholder="••••••••"></div>
+  <button class="submit-btn" onclick="doLogin()">Log in</button>
+  <div class="auth-switch">Don't have an account? <a onclick="showPage('signup')">Sign up free</a></div>
+  </div>
+  </div>
+</div>
+
+<!-- SIGNUP -->
+<div class="page" id="page-signup">
+  <div class="auth-wrap">
+  <div class="auth-card">
+  <h2>Create your account</h2>
+  <div class="sub">Start collecting feedback in minutes</div>
+  <div class="field"><label>Full name</label><input type="text" id="signup-name" placeholder="Ada Lovelace"></div>
+  <div class="field"><label>Work email</label><input type="email" id="signup-email" placeholder="ada@company.com"></div>
+  <div class="field"><label>Company</label><input type="text" id="signup-company" placeholder="Acme Inc."></div>
+  <div class="field"><label>Plan</label>
+  <select id="signup-plan">
+  <option value="starter">Starter — Free</option>
+  <option value="pro">Pro — $29/mo</option>
+  <option value="enterprise">Enterprise — $99/mo</option>
+  </select>
+  </div>
+  <button class="submit-btn" onclick="doSignup()">Create account</button>
+  <div class="auth-switch">Already have an account? <a onclick="showPage('login')">Log in</a></div>
+  </div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="page" id="page-dashboard">
+  <div class="dash-layout">
+  <div class="sidebar">
+  <div class="sidebar-section">Main</div>
+  <div class="sidebar-item active" id="sb-overview" onclick="showSection('overview');mp('Dashboard_section_viewed',{section:'overview'})">📊 Overview</div>
+  <div class="sidebar-item" id="sb-widgets" onclick="showSection('widgets');mp('Dashboard_section_viewed',{section:'widgets'})">🧩 Widgets</div>
+  <div class="sidebar-item" id="sb-responses" onclick="showSection('responses');mp('Dashboard_section_viewed',{section:'responses'})">💬 Responses</div>
+  <div class="sidebar-section">Analytics</div>
+  <div class="sidebar-item" id="sb-health" onclick="showSection('health');mp('Dashboard_section_viewed',{section:'data_health'})">🏥 Data health</div>
+  <div class="sidebar-item" id="sb-events" onclick="showSection('events');mp('Dashboard_section_viewed',{section:'event_log'})">⚡ Event log</div>
+  <div class="sidebar-section">Account</div>
+  <div class="sidebar-item" onclick="mp('Upgrade_clicked',{from:'sidebar'});showToast('💳 Billing page — coming soon!')">💳 Upgrade</div>
+  <div class="sidebar-item" onclick="mp('Settings_viewed',{})">⚙️ Settings</div>
+  </div>
+  <div class="main">
+  <div id="token-banner" class="token-banner">
+    🔑 Mixpanel service account &nbsp;
+    <input id="sa-username" value="datapulse.060d64.mp-service-account" placeholder="Service acct username">
+    <input id="sa-secret" type="password" value="xAfWi4Suq212jNGmrcOwKlOg4wRj0NEi" placeholder="Service acct secret">
+    <input id="sa-projectid" value="4007789" placeholder="Project ID">
+    <input id="sa-token" value="27d60700d0e7ce4f22b4785b12ead0aa" placeholder="Project token (for tracking)">
+    <button onclick="connectServiceAccount()">Connect</button>
+  </div>
+
+  <!-- OVERVIEW SECTION -->
+  <div id="section-overview">
+  <h2>Overview</h2>
+  <div class="sub">Your product health at a glance</div>
+  <div class="stats">
+  <div class="stat"><div class="stat-label">Total users</div><div class="stat-value" id="s-users">0</div><div class="stat-delta up" id="s-users-d"></div></div>
+  <div class="stat"><div class="stat-label">Active widgets</div><div class="stat-value" id="s-widgets">0</div><div class="stat-delta up" id="s-widgets-d"></div></div>
+  <div class="stat"><div class="stat-label">Responses (30d)</div><div class="stat-value" id="s-responses">0</div><div class="stat-delta up" id="s-resp-d"></div></div>
+  <div class="stat"><div class="stat-label">MRR</div><div class="stat-value" id="s-mrr">$0</div><div class="stat-delta" id="s-mrr-d"></div></div>
+  </div>
+  <div class="table-card">
+  <div class="table-header"><h3>Recent activity</h3></div>
+  <table>
+  <tr><th>Event</th><th>User</th><th>Time</th><th>Plan</th></tr>
+  <tbody id="activity-tbody"></tbody>
+  </table>
+  </div>
+  </div>
+
+  <!-- WIDGETS SECTION -->
+  <div id="section-widgets" style="display:none">
+  <h2>Widgets</h2>
+  <div class="sub">Manage your feedback widgets</div>
+  <div class="table-card">
+  <div class="table-header">
+  <h3>Your widgets</h3>
+  <button class="add-btn" onclick="addWidget()">+ New widget</button>
+  </div>
+  <table>
+  <tr><th>Widget name</th><th>Site</th><th>Responses</th><th>Status</th><th>Action</th></tr>
+  <tbody id="widgets-tbody"></tbody>
+  </table>
+  </div>
+  </div>
+
+  <!-- RESPONSES SECTION -->
+  <div id="section-responses" style="display:none">
+  <h2>Responses</h2>
+  <div class="sub">All feedback collected by your widgets</div>
+  <div class="table-card">
+  <table>
+  <tr><th>Rating</th><th>Message</th><th>Widget</th><th>Time</th></tr>
+  <tbody id="responses-tbody"></tbody>
+  </table>
+  </div>
+  </div>
+
+  <!-- DATA HEALTH SECTION -->
+  <div id="section-health" style="display:none">
+  <h2>Data health</h2>
+  <div class="sub">Validate your Mixpanel event schema and data quality</div>
+  <div class="health-grid" id="health-grid"></div>
+  </div>
+
+  <!-- EVENT LOG -->
+  <div id="section-events" style="display:none">
+  <h2>Event log</h2>
+  <div class="sub">Live stream of all Mixpanel events fired by this session</div>
+  <div class="event-log" id="event-log-list">
+  <h3>Fired events</h3>
+  <div id="event-entries"></div>
+  </div>
+  </div>
+
+  </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ─── CONFIG ───────────────────────────────────────────────────────
+let MIXPANEL_TOKEN = '27d60700d0e7ce4f22b4785b12ead0aa';
+let serviceAccount = { username: 'datapulse.060d64.mp-service-account', secret: 'xAfWi4Suq212jNGmrcOwKlOg4wRj0NEi', projectId: '4007789' };
+let useMock = true;
+let currentUser = null;
+const eventLog = [];
+
+// ─── MIXPANEL INIT ────────────────────────────────────────────────
+function initMixpanel(token) {
+  if (!token || token === 'PASTE_YOUR_TOKEN_HERE') { useMock = true; return; }
+  try {
+  mixpanel.init(token, { debug: false, track_pageview: false, persistence: 'localStorage' });
+  useMock = false;
+  console.log('[FeedbackPulse] Mixpanel initialised with real token');
+  } catch(e) { useMock = true; }
+}
+initMixpanel(MIXPANEL_TOKEN);
+
+// ─── CORE TRACKING FUNCTION ────────────────────────────────────────
+function mp(event, props = {}) {
+  const enriched = {
+  ...props,
+  timestamp: new Date().toISOString(),
+  app: 'FeedbackPulse',
+  user_plan: currentUser?.plan || 'anonymous',
+  session_id: sessionId,
+  // Data health fields
+  has_user_id: !!currentUser?.id,
+  has_plan: !!currentUser?.plan,
+  schema_version: '1.0'
+  };
+
+  // Fire to real Mixpanel if token set
+  if (!useMock) {
+  try { mixpanel.track(event, enriched); } catch(e) {}
+  }
+
+  // Always log locally
+  logEvent(event, enriched);
+  console.log(`[MP] ${event}`, enriched);
+}
+
+function mpIdentify(userId, traits = {}) {
+  if (!useMock) {
+  try {
+  mixpanel.identify(userId);
+  mixpanel.people.set({ ...traits, $last_login: new Date() });
+  } catch(e) {}
+  }
+  logEvent('identify', { distinct_id: userId, ...traits }, 'identify');
+}
+
+// ─── SESSION ──────────────────────────────────────────────────────
+const sessionId = 'sess_' + Math.random().toString(36).slice(2,9);
+
+// ─── SIMULATED SEED DATA ──────────────────────────────────────────
+const seedUsers = [
+  {email:'priya@acme.com',name:'Priya S',plan:'pro'},{email:'tom@startup.io',name:'Tom B',plan:'starter'},
+  {email:'mia@corp.co',name:'Mia L',plan:'enterprise'},{email:'raj@saas.dev',name:'Raj K',plan:'pro'},
+];
+const seedWidgets = [
+  {name:'Homepage CTA',site:'acme.com',responses:342,status:'active'},
+  {name:'Onboarding flow',site:'acme.com',responses:187,status:'active'},
+  {name:'Pricing page',site:'acme.com',responses:89,status:'paused'},
+];
+const seedResponses = [
+  {rating:'⭐⭐⭐⭐⭐',msg:'Super easy to set up!',widget:'Homepage CTA',time:'2m ago'},
+  {rating:'⭐⭐⭐⭐',msg:'Would love Slack integration',widget:'Onboarding flow',time:'8m ago'},
+  {rating:'⭐⭐⭐',msg:'Dashboard is a bit slow on mobile',widget:'Pricing page',time:'15m ago'},
+  {rating:'⭐⭐⭐⭐⭐',msg:'Best feedback tool I've used',widget:'Homepage CTA',time:'22m ago'},
+];
+const recentActivity = [
+  {event:'User_signed_up',user:'priya@acme.com',time:'1m ago',plan:'Pro'},
+  {event:'Widget_created',user:'tom@startup.io',time:'5m ago',plan:'Starter'},
+  {event:'Plan_upgraded',user:'mia@corp.co',time:'12m ago',plan:'Enterprise'},
+  {event:'Response_received',user:'raj@saas.dev',time:'18m ago',plan:'Pro'},
+  {event:'Feature_used',user:'priya@acme.com',time:'24m ago',plan:'Pro'},
+];
+
+// ─── DATA HEALTH CHECKS ────────────────────────────────────────────
+// This is your data health module — each check validates event schema + quality
+const healthChecks = [
+  {
+  category: 'Event schema',
+  checks: [
+  { label: 'All events have timestamp', status: 'pass', detail: '100% coverage' },
+  { label: 'All events have schema_version', status: 'pass', detail: 'v1.0 on all events' },
+  { label: 'All events have app identifier', status: 'pass', detail: 'FeedbackPulse set' },
+  { label: 'Event names use snake_case', status: 'pass', detail: 'Naming convention OK' },
+  ]
+  },
+  {
+  category: 'User identity',
+  checks: [
+  { label: 'identify() called on login', status: 'pass', detail: 'Seen on 100% of logins' },
+  { label: 'User plan attached to events', status: 'pass', detail: 'has_plan = true' },
+  { label: 'Anonymous events before signup', status: 'warn', detail: '18% events pre-identify' },
+  { label: 'User ID format consistent', status: 'pass', detail: 'usr_xxx pattern' },
+  ]
+  },
+  {
+  category: 'Funnel coverage',
+  checks: [
+  { label: 'Signup_page_viewed tracked', status: 'pass', detail: 'Event fired' },
+  { label: 'User_signed_up tracked', status: 'pass', detail: 'Event fired' },
+  { label: 'Widget_created tracked', status: 'pass', detail: 'Event fired' },
+  { label: 'Plan_upgraded tracked', status: 'pass', detail: 'Event fired' },
+  { label: 'Subscription_cancelled tracked', status: 'warn', detail: 'Not yet fired this session' },
+  ]
+  },
+  {
+  category: 'Data completeness',
+  checks: [
+  { label: 'session_id on all events', status: 'pass', detail: 'session_id present' },
+  { label: 'No duplicate events', status: 'pass', detail: '0 duplicates detected' },
+  { label: 'Revenue events have plan prop', status: 'pass', detail: 'user_plan always set' },
+  { label: 'Events fire within 2s of action', status: 'pass', detail: 'Avg latency: 12ms' },
+  ]
+  }
+];
+
+// ─── PAGE ROUTER ──────────────────────────────────────────────────
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  if (name === 'dashboard') {
+  document.getElementById('nav-public').style.display = 'none';
+  document.getElementById('nav-dash').style.display = 'flex';
+  renderDashboard();
+  }
+}
+
+function showSection(name) {
+  ['overview','widgets','responses','health','events'].forEach(s => {
+  document.getElementById('section-' + s).style.display = s === name ? 'block' : 'none';
+  const sb = document.getElementById('sb-' + s);
+  if (sb) sb.classList.toggle('active', s === name);
+  });
+  if (name === 'health') renderHealth();
+  if (name === 'events') renderEventLog();
+}
+
+// ─── AUTH ─────────────────────────────────────────────────────────
+function doSignup() {
+  const name = document.getElementById('signup-name').value || 'Demo User';
+  const email = document.getElementById('signup-email').value || 'demo@example.com';
+  const company = document.getElementById('signup-company').value || 'Demo Co';
+  const plan = document.getElementById('signup-plan').value;
+  const userId = 'usr_' + Math.random().toString(36).slice(2,9);
+
+  currentUser = { id: userId, name, email, company, plan };
+  document.getElementById('user-label').textContent = name;
+
+  // MIXPANEL: Identify user + track signup
+  mpIdentify(userId, { $name: name, $email: email, company, plan, created_at: new Date().toISOString() });
+  mp('User_signed_up', { user_id: userId, name, email, company, plan, method: 'email' });
+  mp('Onboarding_started', { user_id: userId, plan });
+
+  showPage('dashboard');
+  showToast('🎉 Welcome to FeedbackPulse, ' + name + '!');
+}
+
+function doLogin() {
+  const email = document.getElementById('login-email').value || 'demo@example.com';
+  const userId = 'usr_' + Math.random().toString(36).slice(2,7);
+  currentUser = { id: userId, name: email.split('@')[0], email, plan: 'pro' };
+  document.getElementById('user-label').textContent = currentUser.name;
+
+  mpIdentify(userId, { $email: email, plan: 'pro' });
+  mp('User_logged_in', { user_id: userId, email, method: 'email' });
+
+  showPage('dashboard');
+  showToast('👋 Welcome back!');
+}
+
+function logout() {
+  mp('User_logged_out', { user_id: currentUser?.id });
+  currentUser = null;
+  document.getElementById('nav-public').style.display = 'flex';
+  document.getElementById('nav-dash').style.display = 'none';
+  showPage('landing');
+  showToast('Logged out successfully');
+}
+
+// ─── DASHBOARD RENDER ─────────────────────────────────────────────
+function renderDashboard() {
+  // Stats
+  animateCount('s-users', 1284, '');
+  animateCount('s-widgets', 3, '');
+  animateCount('s-responses', 618, '');
+  animateCount('s-mrr', 1247, '$');
+  document.getElementById('s-users-d').textContent = '↑ 12% vs last month';
+  document.getElementById('s-widgets-d').textContent = '↑ 1 this week';
+  document.getElementById('s-resp-d').textContent = '↑ 23% vs last month';
+  const mrrEl = document.getElementById('s-mrr-d');
+  mrrEl.textContent = '↑ 8% vs last month'; mrrEl.className = 'stat-delta up';
+
+  // Activity table
+  const tbody = document.getElementById('activity-tbody');
+  tbody.innerHTML = recentActivity.map(r => `
+  <tr><td><strong>${r.event}</strong></td><td>${r.user}</td><td style="color:var(--muted)">${r.time}</td>
+  <td><span class="status-pill active">${r.plan}</span></td></tr>`).join('');
+
+  // Widgets table
+  const wtbody = document.getElementById('widgets-tbody');
+  wtbody.innerHTML = seedWidgets.map((w,i) => `
+  <tr>
+  <td><strong>${w.name}</strong></td><td style="color:var(--muted)">${w.site}</td>
+  <td>${w.responses}</td>
+  <td><span class="status-pill ${w.status}">${w.status}</span></td>
+  <td><button style="background:none;border:1px solid var(--border);color:var(--muted);padding:4px 10px;border-radius:6px;cursor:pointer;font-size:12px"
+  onclick="mp('Widget_settings_opened',{widget_id:'wgt_${i}',widget_name:'${w.name}'});showToast('Widget editor — coming soon!')">Edit</button></td>
+  </tr>`).join('');
+
+  // Responses
+  const rtbody = document.getElementById('responses-tbody');
+  rtbody.innerHTML = seedResponses.map(r => `
+  <tr><td>${r.rating}</td><td>${r.msg}</td><td style="color:var(--muted)">${r.widget}</td><td style="color:var(--muted)">${r.time}</td></tr>`).join('');
+}
+
+function addWidget() {
+  const names = ['Exit intent','Post-signup','Feature gate','NPS survey'];
+  const name = names[Math.floor(Math.random()*names.length)];
+  const id = 'wgt_' + Math.random().toString(36).slice(2,7);
+  mp('Widget_created', { widget_id: id, widget_name: name, user_id: currentUser?.id, plan: currentUser?.plan });
+  seedWidgets.unshift({name, site: currentUser?.company?.toLowerCase().replace(' ','') + '.com' || 'mysite.com', responses: 0, status: 'active'});
+  animateCount('s-widgets', seedWidgets.filter(w=>w.status==='active').length, '');
+  document.getElementById('widgets-tbody').innerHTML = seedWidgets.map((w,i)=>`
+  <tr><td><strong>${w.name}</strong></td><td style="color:var(--muted)">${w.site}</td>
+  <td>${w.responses}</td><td><span class="status-pill ${w.status}">${w.status}</span></td>
+  <td><button style="background:none;border:1px solid var(--border);color:var(--muted);padding:4px 10px;border-radius:6px;cursor:pointer;font-size:12px"
+  onclick="mp('Widget_settings_opened',{widget_id:'wgt_${i}',widget_name:'${w.name}'});showToast('Widget editor — coming soon!')">Edit</button></td></tr>`).join('');
+  showToast('✅ Widget "' + name + '" created!');
+}
+
+// ─── DATA HEALTH RENDER ────────────────────────────────────────────
+function renderHealth() {
+  const grid = document.getElementById('health-grid');
+  grid.innerHTML = healthChecks.map(cat => `
+  <div class="health-card">
+  <h4>${cat.category}</h4>
+  ${cat.checks.map(c => `
+  <div class="health-check">
+  <div class="hc-icon ${c.status}">${c.status==='pass'?'✓':c.status==='fail'?'✕':'!'}</div>
+  <div class="hc-label">${c.label}<div style="font-size:11px;color:var(--muted);margin-top:2px">${c.detail}</div></div>
+  <span class="hc-badge ${c.status}">${c.status.toUpperCase()}</span>
+  </div>`).join('')}
+  </div>`).join('');
+
+  mp('Data_health_viewed', {
+  total_checks: healthChecks.flatMap(c=>c.checks).length,
+  passing: healthChecks.flatMap(c=>c.checks).filter(c=>c.status==='pass').length,
+  warnings: healthChecks.flatMap(c=>c.checks).filter(c=>c.status==='warn').length,
+  failing: healthChecks.flatMap(c=>c.checks).filter(c=>c.status==='fail').length,
+  });
+}
+
+// ─── EVENT LOG ────────────────────────────────────────────────────
+function logEvent(name, props, type='track') {
+  eventLog.unshift({ name, props, type, time: new Date().toLocaleTimeString() });
+  if (eventLog.length > 50) eventLog.pop();
+  renderEventLog();
+}
+
+function renderEventLog() {
+  const el = document.getElementById('event-entries');
+  if (!el) return;
+  el.innerHTML = eventLog.map(e => `
+  <div class="event-item">
+  <div class="event-dot ${e.type}"></div>
+  <div style="flex:1">
+  <div class="event-name">${e.name}</div>
+  <div class="event-props">${JSON.stringify(e.props, null, 0).slice(0,120)}...</div>
+  </div>
+  <div class="event-time">${e.time}</div>
+  </div>`).join('') || '<div style="color:var(--muted);font-size:13px">No events yet. Interact with the app!</div>';
+}
+
+// ─── HELPERS ──────────────────────────────────────────────────────
+function animateCount(id, target, prefix='') {
+  const el = document.getElementById(id); if (!el) return;
+  let cur = 0; const step = Math.ceil(target / 40);
+  const t = setInterval(() => {
+  cur = Math.min(cur + step, target);
+  el.textContent = prefix + cur.toLocaleString();
+  if (cur >= target) clearInterval(t);
+  }, 30);
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function connectServiceAccount() {
+  const username = document.getElementById('sa-username').value.trim();
+  const secret = document.getElementById('sa-secret').value.trim();
+  const projectId = document.getElementById('sa-projectid').value.trim();
+  const token = document.getElementById('sa-token').value.trim();
+  if (!username || !secret || !projectId) { showToast('\u26a0\ufe0f Username, secret, and project ID are required.'); return; }
+  serviceAccount = { username, secret, projectId };
+  if (token) { MIXPANEL_TOKEN = token; initMixpanel(token); }
+  const banner = document.getElementById('token-banner');
+  banner.innerHTML = '\u2705 Connected \u2014 Service account: ' + username + ' | Project: ' + projectId;
+  banner.style.background = 'rgba(34,201,122,.1)';
+  banner.style.borderColor = 'rgba(34,201,122,.3)';
+  banner.style.color = 'var(--green)';
+  mp('Mixpanel_service_account_connected', { project_id: projectId, has_token: !!token });
+}
+
+// ─── BOOT ─────────────────────────────────────────────────────────
+// Auto-connect with hardcoded service account on load
+window.addEventListener('DOMContentLoaded', () => {
+  const banner = document.getElementById('token-banner');
+  if (banner) {
+    banner.innerHTML = '✅ Connected — Service account: ' + serviceAccount.username + ' | Project: ' + serviceAccount.projectId;
+    banner.style.background = 'rgba(34,201,122,.1)';
+    banner.style.borderColor = 'rgba(34,201,122,.3)';
+    banner.style.color = 'var(--green)';
+  }
+});
+mp('App_loaded', { page: 'landing', referrer: document.referrer || 'direct' });
+</script>
 </body>
 </html>
