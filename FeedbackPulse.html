@@ -119,21 +119,6 @@
   .event-name{font-weight:600;margin-bottom:2px}
   .event-props{color:var(--muted);font-size:12px;font-family:monospace}
   .event-time{color:var(--muted);font-size:11px;margin-left:auto;flex-shrink:0}
-  /* DATA HEALTH */
-  .health-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:24px}
-  .health-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px}
-  .health-card h4{font-size:14px;font-weight:700;margin-bottom:14px}
-  .health-check{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
-  .health-check:last-child{border-bottom:none}
-  .hc-icon{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
-  .hc-icon.pass{background:rgba(34,201,122,.15);color:var(--green)}
-  .hc-icon.fail{background:rgba(242,95,92,.15);color:var(--red)}
-  .hc-icon.warn{background:rgba(245,166,35,.15);color:var(--amber)}
-  .hc-label{flex:1}
-  .hc-badge{font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px}
-  .hc-badge.pass{background:rgba(34,201,122,.12);color:var(--green)}
-  .hc-badge.fail{background:rgba(242,95,92,.12);color:var(--red)}
-  .hc-badge.warn{background:rgba(245,166,35,.12);color:var(--amber)}
   /* TOAST */
   #toast{position:fixed;bottom:24px;right:24px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 18px;font-size:13px;display:none;z-index:999;max-width:320px;box-shadow:0 8px 32px rgba(0,0,0,.4)}
   #toast.show{display:block;animation:fadeIn .2s ease}
@@ -266,7 +251,6 @@
   <div class="sidebar-item" id="sb-widgets" onclick="showSection('widgets');mp('Dashboard_section_viewed',{section:'widgets'})">🧩 Widgets</div>
   <div class="sidebar-item" id="sb-responses" onclick="showSection('responses');mp('Dashboard_section_viewed',{section:'responses'})">💬 Responses</div>
   <div class="sidebar-section">Analytics</div>
-  <div class="sidebar-item" id="sb-health" onclick="showSection('health');mp('Dashboard_section_viewed',{section:'data_health'})">🏥 Data health</div>
   <div class="sidebar-item" id="sb-events" onclick="showSection('events');mp('Dashboard_section_viewed',{section:'event_log'})">⚡ Event log</div>
   <div class="sidebar-section">Account</div>
   <div class="sidebar-item" onclick="mp('Upgrade_clicked',{from:'sidebar'});showToast('💳 Billing page — coming soon!')">💳 Upgrade</div>
@@ -320,12 +304,6 @@
   </div>
   </div>
 
-  <!-- DATA HEALTH SECTION -->
-  <div id="section-health" style="display:none">
-  <h2>Data health</h2>
-  <div class="sub">Validate your Mixpanel event schema and data quality</div>
-  <div class="health-grid" id="health-grid"></div>
-  </div>
 
   <!-- EVENT LOG -->
   <div id="section-events" style="display:none">
@@ -370,7 +348,6 @@ function mp(event, props = {}) {
   app: 'FeedbackPulse',
   user_plan: currentUser?.plan || 'anonymous',
   session_id: sessionId,
-  // Data health fields
   has_user_id: !!currentUser?.id,
   has_plan: !!currentUser?.plan,
   schema_version: '1.0'
@@ -423,47 +400,6 @@ const recentActivity = [
   {event:'Feature_used',user:'priya@acme.com',time:'24m ago',plan:'Pro'},
 ];
 
-// ─── DATA HEALTH CHECKS ────────────────────────────────────────────
-// This is your data health module — each check validates event schema + quality
-const healthChecks = [
-  {
-  category: 'Event schema',
-  checks: [
-  { label: 'All events have timestamp', status: 'pass', detail: '100% coverage' },
-  { label: 'All events have schema_version', status: 'pass', detail: 'v1.0 on all events' },
-  { label: 'All events have app identifier', status: 'pass', detail: 'FeedbackPulse set' },
-  { label: 'Event names use snake_case', status: 'pass', detail: 'Naming convention OK' },
-  ]
-  },
-  {
-  category: 'User identity',
-  checks: [
-  { label: 'identify() called on login', status: 'pass', detail: 'Seen on 100% of logins' },
-  { label: 'User plan attached to events', status: 'pass', detail: 'has_plan = true' },
-  { label: 'Anonymous events before signup', status: 'warn', detail: '18% events pre-identify' },
-  { label: 'User ID format consistent', status: 'pass', detail: 'usr_xxx pattern' },
-  ]
-  },
-  {
-  category: 'Funnel coverage',
-  checks: [
-  { label: 'Signup_page_viewed tracked', status: 'pass', detail: 'Event fired' },
-  { label: 'User_signed_up tracked', status: 'pass', detail: 'Event fired' },
-  { label: 'Widget_created tracked', status: 'pass', detail: 'Event fired' },
-  { label: 'Plan_upgraded tracked', status: 'pass', detail: 'Event fired' },
-  { label: 'Subscription_cancelled tracked', status: 'warn', detail: 'Not yet fired this session' },
-  ]
-  },
-  {
-  category: 'Data completeness',
-  checks: [
-  { label: 'session_id on all events', status: 'pass', detail: 'session_id present' },
-  { label: 'No duplicate events', status: 'pass', detail: '0 duplicates detected' },
-  { label: 'Revenue events have plan prop', status: 'pass', detail: 'user_plan always set' },
-  { label: 'Events fire within 2s of action', status: 'pass', detail: 'Avg latency: 12ms' },
-  ]
-  }
-];
 
 // ─── PAGE ROUTER ──────────────────────────────────────────────────
 function showPage(name) {
@@ -477,12 +413,11 @@ function showPage(name) {
 }
 
 function showSection(name) {
-  ['overview','widgets','responses','health','events'].forEach(s => {
+  ['overview','widgets','responses','events'].forEach(s => {
   document.getElementById('section-' + s).style.display = s === name ? 'block' : 'none';
   const sb = document.getElementById('sb-' + s);
   if (sb) sb.classList.toggle('active', s === name);
   });
-  if (name === 'health') renderHealth();
   if (name === 'events') renderEventLog();
 }
 
@@ -582,27 +517,6 @@ function addWidget() {
   showToast('✅ Widget "' + name + '" created!');
 }
 
-// ─── DATA HEALTH RENDER ────────────────────────────────────────────
-function renderHealth() {
-  const grid = document.getElementById('health-grid');
-  grid.innerHTML = healthChecks.map(cat => `
-  <div class="health-card">
-  <h4>${cat.category}</h4>
-  ${cat.checks.map(c => `
-  <div class="health-check">
-  <div class="hc-icon ${c.status}">${c.status==='pass'?'✓':c.status==='fail'?'✕':'!'}</div>
-  <div class="hc-label">${c.label}<div style="font-size:11px;color:var(--muted);margin-top:2px">${c.detail}</div></div>
-  <span class="hc-badge ${c.status}">${c.status.toUpperCase()}</span>
-  </div>`).join('')}
-  </div>`).join('');
-
-  mp('Data_health_viewed', {
-  total_checks: healthChecks.flatMap(c=>c.checks).length,
-  passing: healthChecks.flatMap(c=>c.checks).filter(c=>c.status==='pass').length,
-  warnings: healthChecks.flatMap(c=>c.checks).filter(c=>c.status==='warn').length,
-  failing: healthChecks.flatMap(c=>c.checks).filter(c=>c.status==='fail').length,
-  });
-}
 
 // ─── EVENT LOG ────────────────────────────────────────────────────
 function logEvent(name, props, type='track') {
